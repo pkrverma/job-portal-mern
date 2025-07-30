@@ -11,7 +11,7 @@ app.use(cors());
 //username: pulkit18012003
 //password: dwZwp08rYXATbBvL
 
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@job-portal.4vuwskt.mongodb.net/?retryWrites=true&w=majority&appName=job-portal`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -35,6 +35,44 @@ async function run() {
     app.get("/all-jobs", async (req, res) => {
       const jobs = await jobCollections.find({}).toArray();
       res.send(jobs);
+    });
+
+    // get my jobs
+    app.get("/myJobs/:email", async (req, res) => {
+      // console.log(req.params.email);
+      const job = await jobCollections
+        .find({ postedBy: req.params.email })
+        .toArray();
+      res.send(job);
+    });
+
+    //delete a job
+    app.delete("/job/:id", async (req, res) => {
+      try {
+        const id = req.params.id;
+        const filter = { _id: new ObjectId(id) };
+        const result = await jobCollections.deleteOne(filter);
+        
+        if (result.deletedCount === 1) {
+          res.status(200).send({
+            acknowledged: true,
+            deletedCount: 1,
+            message: "Job deleted successfully"
+          });
+        } else {
+          res.status(404).send({
+            acknowledged: false,
+            message: "Job not found"
+          });
+        }
+      } catch (error) {
+        console.error("Error deleting job:", error);
+        res.status(500).send({
+          acknowledged: false,
+          message: "Internal server error",
+          error: error.message
+        });
+      }
     });
 
     //post a job

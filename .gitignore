@@ -1,0 +1,238 @@
+# Dependencies
+node_modules/
+*/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Build outputs
+dist/
+build/
+*/dist/
+*/build/
+dist-ssr/
+*.local
+
+# Environment variables (SENSITIVE)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+.env.*
+
+# Database connection strings and API keys (SENSITIVE)
+config/database.js
+config/keys.js
+config/config.json
+secrets/
+credentials/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# nyc test coverage
+.nyc_output
+
+# Dependency directories
+jspm_packages/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# Parcel-bundler cache
+.cache
+.parcel-cache
+
+# Next.js build output
+.next
+out
+
+# Nuxt.js build / generate output
+.nuxt
+
+# Gatsby files
+.cache/
+
+# Storybook build outputs
+.out
+.storybook-out
+
+# Temporary folders
+tmp/
+temp/
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Folder config file
+Desktop.ini
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# Windows Installer files
+*.cab
+*.msi
+*.msm
+*.msp
+
+# Windows shortcuts
+*.lnk
+
+# Database files (SENSITIVE)
+*.sqlite
+*.db
+*.sqlite3
+*.db3
+
+# Firebase (SENSITIVE)
+.firebase/
+firebase-adminsdk-*.json
+serviceAccountKey.json
+
+# AWS (SENSITIVE)
+.aws/
+aws-exports.js
+
+# Vercel (SENSITIVE)
+.vercel
+
+# MongoDB (SENSITIVE)
+*.mongodb
+
+# Redis dump file
+dump.rdb
+
+# PM2 logs
+.pm2
+
+# Docker
+docker-compose.override.yml
+Dockerfile.local
+
+# SSL certificates (SENSITIVE)
+*.pem
+*.key
+*.crt
+*.cer
+*.p12
+*.pfx
+
+# Authentication tokens (SENSITIVE)
+auth_token
+access_token
+refresh_token
+jwt_secret
+*.token
+
+# Email credentials (SENSITIVE)
+mail_config.js
+smtp_config.js
+
+# Payment gateway keys (SENSITIVE)
+stripe_keys.js
+paypal_config.js
+razorpay_config.js
+
+# Social media API keys (SENSITIVE)
+facebook_config.js
+google_config.js
+twitter_config.js
+
+# Cloud storage keys (SENSITIVE)
+cloudinary_config.js
+s3_config.js
+azure_config.js
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# IDE specific files
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# MacOS
+.AppleDouble
+.LSOverride
+Icon
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# Package lock files (optional - uncomment if you want to ignore them)
+# package-lock.json
+# yarn.lock
+
+# Local configuration files that might contain sensitive data
+local_config.js
+local_settings.js
+development_config.js
+production_config.js
