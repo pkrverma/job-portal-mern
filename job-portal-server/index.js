@@ -37,6 +37,13 @@ async function run() {
       res.send(jobs);
     });
 
+    //get single job using id
+    app.get("/all-jobs/:id", async (req, res) => {
+      const id = req.params.id;
+      const job = await jobCollections.findOne({ _id: new ObjectId(id) });
+      res.send(job);
+    });
+
     // get my jobs
     app.get("/myJobs/:email", async (req, res) => {
       // console.log(req.params.email);
@@ -52,17 +59,17 @@ async function run() {
         const id = req.params.id;
         const filter = { _id: new ObjectId(id) };
         const result = await jobCollections.deleteOne(filter);
-        
+
         if (result.deletedCount === 1) {
           res.status(200).send({
             acknowledged: true,
             deletedCount: 1,
-            message: "Job deleted successfully"
+            message: "Job deleted successfully",
           });
         } else {
           res.status(404).send({
             acknowledged: false,
-            message: "Job not found"
+            message: "Job not found",
           });
         }
       } catch (error) {
@@ -70,9 +77,24 @@ async function run() {
         res.status(500).send({
           acknowledged: false,
           message: "Internal server error",
-          error: error.message
+          error: error.message,
         });
       }
+    });
+
+    //update a job
+    app.patch("/update-job/:id", async (req, res) => {
+      const id = req.params.id;
+      const jobData = req.body;
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: {
+          ...jobData,
+        },
+      };
+      const result = await jobCollections.updateOne(filter, updateDoc, options);
+      res.send(result);
     });
 
     //post a job
