@@ -3,7 +3,6 @@ import { createBrowserRouter } from "react-router";
 import App from "../App";
 import Home from "../Pages/Home";
 import CreateJob from "../Pages/CreateJob";
-import About from "../Pages/About";
 import MyJobs from "../Pages/MyJobs";
 import Applications from "../Pages/Applications";
 import AppliedJobs from "../Pages/AppliedJobs";
