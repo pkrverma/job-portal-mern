@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
-import { AuthContext } from './AuthContext';
+import React, { useEffect, useState } from "react";
+import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
+import { AuthContext } from "./AuthContext";
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -12,16 +12,22 @@ export const AuthProvider = ({ children }) => {
     const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         setUser(firebaseUser);
-        
+
         // Fetch user role from database using UID first, then email as fallback
         try {
-          let response = await fetch(`http://localhost:3000/user-by-uid/${firebaseUser.uid}`);
-          
+          let response = await fetch(
+            `${import.meta.env.VITE_API_URL}/user-by-uid/${firebaseUser.uid}`
+          );
+
           if (!response.ok && firebaseUser.email) {
             // Fallback to email if UID lookup fails
-            response = await fetch(`http://localhost:3000/user/${encodeURIComponent(firebaseUser.email)}`);
+            response = await fetch(
+              `${import.meta.env.VITE_API_URL}/user/${encodeURIComponent(
+                firebaseUser.email
+              )}`
+            );
           }
-          
+
           if (response.ok) {
             const userData = await response.json();
             setUserRole(userData.role || null);
@@ -29,7 +35,7 @@ export const AuthProvider = ({ children }) => {
             setUserRole(null);
           }
         } catch (error) {
-          console.error('Error fetching user role:', error);
+          console.error("Error fetching user role:", error);
           setUserRole(null);
         }
       } else {
@@ -46,9 +52,9 @@ export const AuthProvider = ({ children }) => {
       await signOut(auth);
       setUserRole(null);
       // Redirect to login page after logout
-      window.location.href = '/login';
+      window.location.href = "/login";
     } catch (error) {
-      console.error('Error signing out:', error);
+      console.error("Error signing out:", error);
     }
   };
 

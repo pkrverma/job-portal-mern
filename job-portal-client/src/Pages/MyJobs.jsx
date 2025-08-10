@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router";
-import { useAuth } from '../context/useAuth';
+import { useAuth } from "../context/useAuth";
 
 const MyJobs = () => {
   const [jobs, setJobs] = useState([]);
@@ -16,7 +16,9 @@ const MyJobs = () => {
     if (!email) return;
     setIsLoading(true);
     try {
-      const response = await fetch(`http://localhost:3000/myJobs/${encodeURIComponent(email)}`);
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/myJobs/${encodeURIComponent(email)}`
+      );
       const data = await response.json();
       setJobs(data || []);
     } catch (error) {
@@ -58,16 +60,21 @@ const MyJobs = () => {
       if (user?.email) fetchJobs(user.email);
       return;
     }
-    const filter = jobs.filter((job) => job.jobTitle?.toLowerCase().includes(searchText.toLowerCase()));
+    const filter = jobs.filter((job) =>
+      job.jobTitle?.toLowerCase().includes(searchText.toLowerCase())
+    );
     setJobs(filter);
   };
 
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this job?")) {
       try {
-        const response = await fetch(`http://localhost:3000/job/${id}`, {
-          method: "DELETE",
-        });
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/job/${id}`,
+          {
+            method: "DELETE",
+          }
+        );
         const data = await response.json();
 
         if (data.acknowledged === true) {
@@ -84,14 +91,25 @@ const MyJobs = () => {
   };
 
   if (authLoading) {
-    return <div className="max-w-screen-2xl container mx-auto xl:px-24 px-4 py-12">Loading your jobs...</div>;
+    return (
+      <div className="max-w-screen-2xl container mx-auto xl:px-24 px-4 py-12">
+        Loading your jobs...
+      </div>
+    );
   }
 
   if (!user) {
     return (
       <div className="max-w-screen-2xl container mx-auto xl:px-24 px-4 py-12 text-center space-y-4">
-        <h2 className="text-xl font-semibold">Please log in to view your posted jobs.</h2>
-        <Link to="/login" className="bg-blue text-white px-6 py-2 rounded inline-block">Go to Login</Link>
+        <h2 className="text-xl font-semibold">
+          Please log in to view your posted jobs.
+        </h2>
+        <Link
+          to="/login"
+          className="bg-blue text-white px-6 py-2 rounded inline-block"
+        >
+          Go to Login
+        </Link>
       </div>
     );
   }
@@ -167,13 +185,23 @@ const MyJobs = () => {
                 {isLoading ? (
                   <tbody>
                     <tr>
-                      <td colSpan={6} className="text-center py-6 text-sm text-gray-500">Loading...</td>
+                      <td
+                        colSpan={6}
+                        className="text-center py-6 text-sm text-gray-500"
+                      >
+                        Loading...
+                      </td>
                     </tr>
                   </tbody>
                 ) : jobs.length === 0 ? (
                   <tbody>
                     <tr>
-                      <td colSpan={6} className="text-center py-10 text-sm text-gray-500">No job posted</td>
+                      <td
+                        colSpan={6}
+                        className="text-center py-10 text-sm text-gray-500"
+                      >
+                        No job posted
+                      </td>
                     </tr>
                   </tbody>
                 ) : (

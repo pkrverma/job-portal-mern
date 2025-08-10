@@ -2,7 +2,7 @@ import { Outlet } from "react-router";
 import "./App.css";
 import Navbar from "./Component/Navbar";
 import Footer from "./Component/Footer";
-import { AuthProvider } from './context/AuthProvider';
+import { AuthProvider } from "./context/AuthProvider";
 
 function App() {
   return (

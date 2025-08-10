@@ -39,7 +39,7 @@ const Router = createBrowserRouter([
         path: "/edit-job/:id",
         element: <UpdateJob />,
         loader: ({ params }) =>
-          fetch(`http://localhost:3000/all-jobs/${params.id}`),
+          fetch(`${import.meta.env.VITE_API_URL}/all-jobs/${params.id}`),
       },
       {
         path: "/login",

@@ -1,3 +1,7 @@
-import { createContext } from 'react';
+import { createContext } from "react";
 
-export const AuthContext = createContext({ user: null, loading: true, signOutUser: async () => {} });
+export const AuthContext = createContext({
+  user: null,
+  loading: true,
+  signOutUser: async () => {},
+});

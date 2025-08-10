@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
-@theme{
+@theme {
     --color-primary: #141414;
     --color-blue: #3575e2
 }
 
-body::-webkit-scrollbar{
+body::-webkit-scrollbar {
     display: none;
 }

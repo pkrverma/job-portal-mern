@@ -16,11 +16,11 @@ const JobDetail = () => {
   const { user, userRole } = useAuth();
 
   // Check if current user is the recruiter who posted this job
-  const isJobOwner = user?.email === job?.postedBy && userRole === 'recruiter';
+  const isJobOwner = user?.email === job?.postedBy && userRole === "recruiter";
 
   useEffect(() => {
     if (!id) return;
-    fetch(`http://localhost:3000/all-jobs/${id}`)
+    fetch(`${import.meta.env.VITE_API_URL}/all-jobs/${id}`)
       .then((res) => res.json())
       .then((data) => setJob(data))
       .catch(() => {});
@@ -28,9 +28,13 @@ const JobDetail = () => {
 
   // Check if user has already applied for this job (only for job seekers)
   useEffect(() => {
-    if (!user?.email || !id || userRole === 'recruiter') return;
-    
-    fetch(`http://localhost:3000/check-application/${id}/${encodeURIComponent(user.email)}`)
+    if (!user?.email || !id || userRole === "recruiter") return;
+
+    fetch(
+      `${
+        import.meta.env.VITE_API_URL
+      }/check-application/${id}/${encodeURIComponent(user.email)}`
+    )
       .then((res) => res.json())
       .then((data) => {
         setHasApplied(data.hasApplied || false);
@@ -85,13 +89,16 @@ const JobDetail = () => {
           linkedinUrl: url,
         };
 
-        const response = await fetch("http://localhost:3000/apply-job", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(applicationData),
-        });
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/apply-job`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(applicationData),
+          }
+        );
 
         const result = await response.json();
 
@@ -141,21 +148,24 @@ const JobDetail = () => {
         </p>
       </div>
       <h1>{job.jobTitle}</h1>
-      
+
       <div className="flex flex-col sm:flex-row gap-2 md:gap-4 items-start md:text-md text-sm mt-2">
         <button className="bg-blue px-8 py-2 text-white">
           {job.employmentType}
         </button>
-        
+
         {/* Show Edit Job button if user is the job owner */}
-        {user?.email && job?.postedBy && user.email === job.postedBy && userRole === 'recruiter' ? (
+        {user?.email &&
+        job?.postedBy &&
+        user.email === job.postedBy &&
+        userRole === "recruiter" ? (
           <button
             className="px-8 py-2 text-white bg-orange-600 hover:bg-orange-700 cursor-pointer transition-colors"
             onClick={handleEdit}
           >
             Edit Job
           </button>
-        ) : userRole === 'recruiter' ? (
+        ) : userRole === "recruiter" ? (
           // Show recruiter view for other recruiters
           <button
             className="px-8 py-2 text-gray-500 bg-gray-300 cursor-not-allowed"
@@ -167,8 +177,12 @@ const JobDetail = () => {
           // Show Apply Job button for job seekers
           <button
             className={`px-8 py-2 text-white cursor-pointer transition-colors ${
-              hasApplied ? "bg-green-600 hover:bg-green-700" : "bg-sky-700 hover:bg-sky-800"
-            } ${hasApplied || isApplying ? "opacity-75 cursor-not-allowed" : ""}`}
+              hasApplied
+                ? "bg-green-600 hover:bg-green-700"
+                : "bg-sky-700 hover:bg-sky-800"
+            } ${
+              hasApplied || isApplying ? "opacity-75 cursor-not-allowed" : ""
+            }`}
             onClick={handleApply}
             disabled={hasApplied || isApplying}
           >
@@ -182,12 +196,12 @@ const JobDetail = () => {
         <div className="lg:col-span-3 order-1 lg:order-1">
           <Sidebar detail={job} />
         </div>
-        
+
         {/* Main Content - Job Description */}
         <div className="lg:col-span-5 order-3 lg:order-2">
           <Description detail={job} />
         </div>
-        
+
         {/* Company Details */}
         <div className="lg:col-span-4 order-2 lg:order-3">
           <CompanyDetails job={job} />

@@ -13,7 +13,12 @@ const SignUp = () => {
   const auth = getAuth();
   const navigate = useNavigate();
   const googleProvider = new GoogleAuthProvider();
-  const [form, setForm] = useState({ name: "", email: "", password: "", role: "" });
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+    role: "",
+  });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -42,24 +47,24 @@ const SignUp = () => {
       if (form.name) {
         await updateProfile(cred.user, { displayName: form.name });
       }
-      
+
       // Save user data to database
       const userData = {
         uid: cred.user.uid,
         name: form.name,
         email: form.email,
         role: form.role,
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
       };
-      
-      await fetch("http://localhost:3000/register-user", {
+
+      await fetch(`${import.meta.env.VITE_API_URL}/register-user`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(userData),
       });
-      
+
       navigate("/");
     } catch (err) {
       setError(err.message.replace("Firebase: ", ""));
@@ -71,30 +76,32 @@ const SignUp = () => {
   const handleGoogle = async () => {
     setError("");
     if (!form.role) {
-      setError("Please select your role (Job Seeker or Recruiter) before signing up with Google.");
+      setError(
+        "Please select your role (Job Seeker or Recruiter) before signing up with Google."
+      );
       return;
     }
     setLoading(true);
     try {
       const result = await signInWithPopup(auth, googleProvider);
-      
+
       // Save user data to database
       const userData = {
         uid: result.user.uid,
         name: result.user.displayName,
         email: result.user.email,
         role: form.role, // Use selected role from form
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
       };
-      
-      await fetch("http://localhost:3000/register-user", {
+
+      await fetch(`${import.meta.env.VITE_API_URL}/register-user`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(userData),
       });
-      
+
       navigate("/");
     } catch (err) {
       setError(err.message.replace("Firebase: ", ""));

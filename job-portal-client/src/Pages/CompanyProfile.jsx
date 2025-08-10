@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useAuth } from '../context/useAuth';
-import Swal from 'sweetalert2';
+import { useAuth } from "../context/useAuth";
+import Swal from "sweetalert2";
 
 const CompanyProfile = () => {
   const { user } = useAuth();
@@ -25,10 +25,14 @@ const CompanyProfile = () => {
   useEffect(() => {
     const fetchCompanyData = async () => {
       if (!user?.email) return;
-      
+
       setLoading(true);
       try {
-        const response = await fetch(`http://localhost:3000/company-profile/${encodeURIComponent(user.email)}`);
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/company-profile/${encodeURIComponent(
+            user.email
+          )}`
+        );
         if (response.ok) {
           const data = await response.json();
           setCompanyData(data);
@@ -50,14 +54,18 @@ const CompanyProfile = () => {
   const handleChange = (e) => {
     setCompanyData({
       ...companyData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!user?.email) {
-      Swal.fire('Error', 'You must be logged in to save company profile', 'error');
+      Swal.fire(
+        "Error",
+        "You must be logged in to save company profile",
+        "error"
+      );
       return;
     }
 
@@ -66,50 +74,70 @@ const CompanyProfile = () => {
       const dataToSave = {
         ...companyData,
         recruiterEmail: user.email,
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
       };
 
       // Use POST for new companies, PATCH for updates
       const method = isExistingCompany ? "PATCH" : "POST";
-      const response = await fetch("http://localhost:3000/company-profile", {
-        method: method,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(dataToSave),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/company-profile`,
+        {
+          method: method,
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(dataToSave),
+        }
+      );
 
       if (response.ok) {
         const result = await response.json();
         if (!isExistingCompany) {
           setIsExistingCompany(true); // Mark as existing after first save
         }
-        Swal.fire('Success!', result.message || 'Company profile saved successfully', 'success');
+        Swal.fire(
+          "Success!",
+          result.message || "Company profile saved successfully",
+          "success"
+        );
       } else {
-        const errorData = await response.json().catch(() => ({ message: 'Unknown error occurred' }));
+        const errorData = await response
+          .json()
+          .catch(() => ({ message: "Unknown error occurred" }));
         if (response.status === 409 && !isExistingCompany) {
           // Company already exists, switch to update mode
           setIsExistingCompany(true);
           // Retry with PATCH
-          const retryResponse = await fetch("http://localhost:3000/company-profile", {
-            method: "PATCH",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(dataToSave),
-          });
-          
+          const retryResponse = await fetch(
+            `${import.meta.env.VITE_API_URL}/company-profile`,
+            {
+              method: "PATCH",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(dataToSave),
+            }
+          );
+
           if (retryResponse.ok) {
             const retryResult = await retryResponse.json();
-            Swal.fire('Success!', retryResult.message || 'Company profile updated successfully', 'success');
+            Swal.fire(
+              "Success!",
+              retryResult.message || "Company profile updated successfully",
+              "success"
+            );
             return;
           }
         }
-        throw new Error(errorData.message || 'Failed to save company profile');
+        throw new Error(errorData.message || "Failed to save company profile");
       }
     } catch (error) {
       console.error("Error saving company data:", error);
-      Swal.fire('Error', error.message || 'Failed to save company profile', 'error');
+      Swal.fire(
+        "Error",
+        error.message || "Failed to save company profile",
+        "error"
+      );
     } finally {
       setSaving(false);
     }
@@ -129,8 +157,12 @@ const CompanyProfile = () => {
     <div className="max-w-screen-2xl container mx-auto xl:px-24 px-4 py-8">
       <div className="bg-white rounded-lg shadow-lg p-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Company Profile</h1>
-          <p className="text-gray-600">Manage your company information and details</p>
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">
+            Company Profile
+          </h1>
+          <p className="text-gray-600">
+            Manage your company information and details
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -170,7 +202,8 @@ const CompanyProfile = () => {
           {/* Company Description */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Company Description * ({companyData.description.length}/500 characters)
+              Company Description * ({companyData.description.length}/500
+              characters)
             </label>
             <textarea
               name="description"
@@ -223,7 +256,9 @@ const CompanyProfile = () => {
 
           {/* Contact Information */}
           <div className="border-t pt-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Contact Information</h3>
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">
+              Contact Information
+            </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -259,7 +294,9 @@ const CompanyProfile = () => {
 
           {/* Social Links */}
           <div className="border-t pt-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Online Presence</h3>
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">
+              Online Presence
+            </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -323,14 +360,16 @@ const CompanyProfile = () => {
           {/* Logo Preview */}
           {companyData.companyLogo && (
             <div className="border-t pt-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">Logo Preview</h3>
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                Logo Preview
+              </h3>
               <div className="flex items-center">
                 <img
                   src={companyData.companyLogo}
                   alt="Company Logo"
                   className="h-16 w-16 object-contain border rounded"
                   onError={(e) => {
-                    e.target.style.display = 'none';
+                    e.target.style.display = "none";
                   }}
                 />
                 <span className="ml-4 text-sm text-gray-600">
@@ -347,7 +386,7 @@ const CompanyProfile = () => {
               disabled={saving}
               className="px-8 py-3 bg-blue text-white font-medium rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
             >
-              {saving ? 'Saving...' : 'Save Company Profile'}
+              {saving ? "Saving..." : "Save Company Profile"}
             </button>
           </div>
         </form>

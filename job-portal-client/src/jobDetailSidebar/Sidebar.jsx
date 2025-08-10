@@ -49,7 +49,7 @@ const Sidebar = (props) => {
             {detail.companyLogo && (
               <img
                 src={detail.companyLogo}
-                alt={`${detail.companyName || 'Company'} logo`}
+                alt={`${detail.companyName || "Company"} logo`}
                 className="h-12 w-12 object-cover rounded border flex-shrink-0"
                 loading="lazy"
               />
@@ -61,7 +61,9 @@ const Sidebar = (props) => {
               {detail.companyProfile?.location && (
                 <div className="flex items-center gap-2 text-gray-600">
                   <FiMapPin className="text-gray-400 flex-shrink-0" size={14} />
-                  <span className="text-sm truncate">{detail.companyProfile.location}</span>
+                  <span className="text-sm truncate">
+                    {detail.companyProfile.location}
+                  </span>
                 </div>
               )}
             </div>

@@ -23,15 +23,21 @@ const Login = () => {
     setLoading(true);
     try {
       const result = await signInWithEmailAndPassword(auth, email, password);
-      
+
       // Fetch user role to determine redirect
-      let response = await fetch(`http://localhost:3000/user-by-uid/${result.user.uid}`);
-      
+      let response = await fetch(
+        `${import.meta.env.VITE_API_URL}/user-by-uid/${result.user.uid}`
+      );
+
       if (!response.ok && result.user.email) {
         // Fallback to email if UID lookup fails
-        response = await fetch(`http://localhost:3000/user/${encodeURIComponent(result.user.email)}`);
+        response = await fetch(
+          `${import.meta.env.VITE_API_URL}/user/${encodeURIComponent(
+            result.user.email
+          )}`
+        );
       }
-      
+
       if (response.ok) {
         const userData = await response.json();
         if (userData.role === "recruiter") {
@@ -56,15 +62,21 @@ const Login = () => {
     setLoading(true);
     try {
       const result = await signInWithPopup(auth, googleProvider);
-      
+
       // Check if user exists in database and has a role using UID first
-      let response = await fetch(`http://localhost:3000/user-by-uid/${result.user.uid}`);
-      
+      let response = await fetch(
+        `${import.meta.env.VITE_API_URL}/user-by-uid/${result.user.uid}`
+      );
+
       if (!response.ok && result.user.email) {
         // Fallback to email if UID lookup fails
-        response = await fetch(`http://localhost:3000/user/${encodeURIComponent(result.user.email)}`);
+        response = await fetch(
+          `${import.meta.env.VITE_API_URL}/user/${encodeURIComponent(
+            result.user.email
+          )}`
+        );
       }
-      
+
       if (response.ok) {
         const userData = await response.json();
         if (userData.role) {
@@ -78,7 +90,9 @@ const Login = () => {
           }
         } else {
           // User exists but no role, redirect to signup
-          setError("Please complete your profile setup by selecting your role.");
+          setError(
+            "Please complete your profile setup by selecting your role."
+          );
           // Sign out the user since they need to complete signup
           await auth.signOut();
           navigate("/sign-up");

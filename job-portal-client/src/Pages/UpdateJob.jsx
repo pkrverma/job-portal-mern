@@ -41,7 +41,7 @@ const UpdateJob = () => {
   useEffect(() => {
     if (user?.email) {
       fetch(
-        `http://localhost:3000/company-profile/${encodeURIComponent(
+        `${import.meta.env.VITE_API_URL}/company-profile/${encodeURIComponent(
           user.email
         )}`
       )
@@ -74,7 +74,7 @@ const UpdateJob = () => {
     data.companyLogo = companyProfile?.companyLogo || companyLogo;
 
     console.log("Updating job with data:", data);
-    fetch(`http://localhost:3000/update-job/${id}`, {
+    fetch(`${import.meta.env.VITE_API_URL}/update-job/${id}`, {
       method: "PATCH",
       headers: {
         "content-type": "application/json",
@@ -317,7 +317,9 @@ const UpdateJob = () => {
               </p>
               <p
                 className={`text-xs ${
-                  jobDescription.length > 1000 ? "text-red-500" : "text-gray-500"
+                  jobDescription.length > 1000
+                    ? "text-red-500"
+                    : "text-gray-500"
                 }`}
               >
                 {jobDescription.length}/1000 characters

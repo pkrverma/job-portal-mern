@@ -47,7 +47,6 @@ const Salary = ({ handleClick, handleChange }) => {
           title="< 100,000"
           name="test2"
         />
-        
       </div>
     </div>
   );
