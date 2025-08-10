@@ -5,8 +5,14 @@ import Home from "../Pages/Home";
 import CreateJob from "../Pages/CreateJob";
 import About from "../Pages/About";
 import MyJobs from "../Pages/MyJobs";
+import Applications from "../Pages/Applications";
+import AppliedJobs from "../Pages/AppliedJobs";
+import CompanyProfile from "../Pages/CompanyProfile";
 import SalaryPage from "../Pages/SalaryPage";
 import UpdateJob from "../Pages/UpdateJob";
+import Login from "../Component/Login";
+import SignUp from "../Component/SignUp";
+import JobDetail from "../Pages/JobDetail";
 
 const Router = createBrowserRouter([
   {
@@ -34,6 +40,30 @@ const Router = createBrowserRouter([
         element: <UpdateJob />,
         loader: ({ params }) =>
           fetch(`http://localhost:3000/all-jobs/${params.id}`),
+      },
+      {
+        path: "/login",
+        element: <Login />,
+      },
+      {
+        path: "/sign-up",
+        element: <SignUp />,
+      },
+      {
+        path: "/applications",
+        element: <Applications />,
+      },
+      {
+        path: "/applied-jobs",
+        element: <AppliedJobs />,
+      },
+      {
+        path: "/company-profile",
+        element: <CompanyProfile />,
+      },
+      {
+        path: "/job/:id",
+        element: <JobDetail />,
       },
     ],
   },

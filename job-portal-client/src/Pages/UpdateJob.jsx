@@ -1,10 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import Creatable from "react-select/creatable";
-import { useLoaderData, useParams } from "react-router-dom";
+import { useLoaderData, useParams, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/useAuth";
 
 const UpdateJob = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const {
     _id,
     jobTitle,
@@ -26,15 +29,52 @@ const UpdateJob = () => {
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors },
   } = useForm();
 
   const [selectedOption, setSetselectedOption] = useState(null);
+  const [companyProfile, setCompanyProfile] = useState(null);
+  const [jobDescription, setJobDescription] = useState(description || "");
+
+  // Fetch company profile
+  useEffect(() => {
+    if (user?.email) {
+      fetch(
+        `http://localhost:3000/company-profile/${encodeURIComponent(
+          user.email
+        )}`
+      )
+        .then((res) => {
+          if (res.ok) {
+            return res.json();
+          }
+          return null;
+        })
+        .then((profile) => {
+          if (profile) {
+            setCompanyProfile(profile);
+            // Override with current company profile data
+            setValue("companyName", profile.companyName || "");
+            setValue("companyLogo", profile.companyLogo || "");
+          }
+        })
+        .catch(() => {
+          // No company profile found, keep existing values
+        });
+    }
+  }, [user?.email, setValue]);
 
   const onSubmit = (data) => {
     data.skills = selectedOption;
-    // console.log(data);
-    fetch(`http://localhost:3000//update-job/${id}`, {
+    data.description = jobDescription; // Use controlled description value
+    data.postedBy = user?.email; // Ensure current user's email is used
+    // Use company profile data if available, otherwise keep existing data
+    data.companyName = companyProfile?.companyName || companyName;
+    data.companyLogo = companyProfile?.companyLogo || companyLogo;
+
+    console.log("Updating job with data:", data);
+    fetch(`http://localhost:3000/update-job/${id}`, {
       method: "PATCH",
       headers: {
         "content-type": "application/json",
@@ -43,10 +83,18 @@ const UpdateJob = () => {
     })
       .then((res) => res.json())
       .then((result) => {
-        if (result.acknowledged === true) {
+        console.log("Update result:", result);
+        if (result.acknowledged === true || result.modifiedCount > 0) {
           alert("Job updated successfully!");
+          // Redirect to job detail page
+          navigate(`/job/${id}`);
+        } else {
+          alert("No changes made to the job.");
         }
-        reset();
+      })
+      .catch((error) => {
+        console.error("Error updating job:", error);
+        alert("Failed to update job. Please try again.");
       });
   };
 
@@ -104,6 +152,13 @@ const UpdateJob = () => {
   return (
     <div className="max-w-screen-2xl container mx-auto xl:px-24 px-4">
       <div className="bg-[#fafafa] py-10 px-4 lg:px-16">
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">Update Job</h2>
+          <p className="text-gray-600">
+            Modify job details below. Company information is auto-filled from
+            your profile.
+          </p>
+        </div>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           <div className="create-job-flex ">
             <div className="lg:w-1/2 w-full">
@@ -116,13 +171,19 @@ const UpdateJob = () => {
               />
             </div>
             <div className="lg:w-1/2 w-full">
-              <label className="block mb-2 text-lg">Company Name</label>
+              <label className="block mb-2 text-lg">
+                Company Name{" "}
+                <span className="text-xs text-gray-500 mt-1">
+                  This field cannot be changed (read-only)
+                </span>
+              </label>
               <input
-                className="create-job-input"
+                className="create-job-input bg-gray-100 cursor-not-allowed"
                 type="text"
-                defaultValue={companyName}
-                placeholder="Ex: Microsoft"
+                value={companyProfile?.companyName || companyName || ""}
+                placeholder="Company name from profile"
                 {...register("companyName")}
+                readOnly
               />
             </div>
           </div>
@@ -208,13 +269,19 @@ const UpdateJob = () => {
           </div>
           <div className="create-job-flex">
             <div className="lg:w-1/2 w-full">
-              <label className="block mb-2 text-lg">Company Logo</label>
+              <label className="block mb-2 text-lg">
+                Company Logo{" "}
+                <span className="text-xs text-gray-500 mt-1">
+                  This field cannot be changed (read-only)
+                </span>
+              </label>
               <input
-                className="create-job-input"
+                className="create-job-input bg-gray-100 cursor-not-allowed"
                 type="url"
-                defaultValue={companyLogo}
-                placeholder="Paste your company logo URL"
+                value={companyProfile?.companyLogo || companyLogo || ""}
+                placeholder="Company logo from profile"
                 {...register("companyLogo")}
+                readOnly
               />
             </div>
             <div className="lg:w-1/2 w-full">
@@ -234,22 +301,44 @@ const UpdateJob = () => {
           <div className="w-full">
             <label className="block mb-2 text-lg">Job Description</label>
             <textarea
-              className="w-full pl-3 py-1.5 focus:outline-none placeholder:text-gray-600 bg-white"
+              className="w-full pl-3 py-1.5 focus:outline-none placeholder:text-gray-600 bg-white rounded border"
               rows={6}
-              placeholder="Job Description"
-              defaultValue={description}
-              {...register("description")}
+              placeholder="Describe the job role, responsibilities, and requirements in detail..."
+              value={jobDescription}
+              onChange={(e) => {
+                if (e.target.value.length <= 1000) {
+                  setJobDescription(e.target.value);
+                }
+              }}
             />
+            <div className="flex justify-between items-center mt-1">
+              <p className="text-xs text-gray-500">
+                Provide detailed information about the role and requirements
+              </p>
+              <p
+                className={`text-xs ${
+                  jobDescription.length > 1000 ? "text-red-500" : "text-gray-500"
+                }`}
+              >
+                {jobDescription.length}/1000 characters
+              </p>
+            </div>
           </div>
 
           <div>
-            <label className="block mb-2 text-lg">Job Posted By</label>
+            <label className="block mb-2 text-lg">
+              Job Posted By{" "}
+              <span className="text-xs text-gray-500 mt-1">
+                This field cannot be changed (read-only)
+              </span>
+            </label>
             <input
-              className="w-full create-job-input"
+              className="w-full create-job-input bg-gray-100 cursor-not-allowed"
               type="email"
-              defaultValue={postedBy}
+              value={user?.email || postedBy || ""}
               placeholder="Your email"
-              {...register("postedBy")}
+              readOnly
+              disabled
             />
           </div>
           <input

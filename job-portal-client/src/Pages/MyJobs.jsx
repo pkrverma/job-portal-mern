@@ -1,32 +1,38 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router";
+import { useAuth } from '../context/useAuth';
 
 const MyJobs = () => {
   const [jobs, setJobs] = useState([]);
   const [searchText, setSearchText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const { user, loading: authLoading } = useAuth();
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemPerPage = 4;
 
   // Fetch jobs function
-  const fetchJobs = async () => {
+  const fetchJobs = async (email) => {
+    if (!email) return;
     setIsLoading(true);
     try {
-      const response = await fetch(`http://localhost:3000/myJobs/me@mail.com`);
+      const response = await fetch(`http://localhost:3000/myJobs/${encodeURIComponent(email)}`);
       const data = await response.json();
-      setJobs(data);
+      setJobs(data || []);
     } catch (error) {
       console.error("Error fetching jobs:", error);
-      alert("Error fetching jobs. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchJobs();
-  }, [searchText]);
+    if (user?.email) {
+      fetchJobs(user.email);
+    } else if (!authLoading) {
+      setJobs([]);
+    }
+  }, [user?.email, authLoading]);
 
   //pagination
   const indexOfLastItem = currentPage * itemPerPage;
@@ -47,12 +53,13 @@ const MyJobs = () => {
   };
 
   const handleSearch = () => {
-    const filter = jobs.filter(
-      (job) =>
-        job.jobTitle.toLowerCase().indexOf(searchText.toLowerCase()) !== -1
-    );
+    // client-side filter; for larger datasets consider server-side query param
+    if (!searchText) {
+      if (user?.email) fetchJobs(user.email);
+      return;
+    }
+    const filter = jobs.filter((job) => job.jobTitle?.toLowerCase().includes(searchText.toLowerCase()));
     setJobs(filter);
-    setIsLoading(false);
   };
 
   const handleDelete = async (id) => {
@@ -75,6 +82,19 @@ const MyJobs = () => {
       }
     }
   };
+
+  if (authLoading) {
+    return <div className="max-w-screen-2xl container mx-auto xl:px-24 px-4 py-12">Loading your jobs...</div>;
+  }
+
+  if (!user) {
+    return (
+      <div className="max-w-screen-2xl container mx-auto xl:px-24 px-4 py-12 text-center space-y-4">
+        <h2 className="text-xl font-semibold">Please log in to view your posted jobs.</h2>
+        <Link to="/login" className="bg-blue text-white px-6 py-2 rounded inline-block">Go to Login</Link>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-screen-2xl container mx-auto xl:px-24 px-4">
@@ -146,16 +166,22 @@ const MyJobs = () => {
 
                 {isLoading ? (
                   <tbody>
-                    <tr className="flex items-center justify-center h-20 w-full">
-                      <td>Loading...</td>
+                    <tr>
+                      <td colSpan={6} className="text-center py-6 text-sm text-gray-500">Loading...</td>
+                    </tr>
+                  </tbody>
+                ) : jobs.length === 0 ? (
+                  <tbody>
+                    <tr>
+                      <td colSpan={6} className="text-center py-10 text-sm text-gray-500">No job posted</td>
                     </tr>
                   </tbody>
                 ) : (
                   <tbody>
                     {currentJobs.map((job, index) => (
-                      <tr key={index}>
+                      <tr key={job._id || index}>
                         <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left text-blueGray-700 ">
-                          {index + 1}
+                          {indexOfFirstItem + index + 1}
                         </th>
                         <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 ">
                           {job.jobTitle}

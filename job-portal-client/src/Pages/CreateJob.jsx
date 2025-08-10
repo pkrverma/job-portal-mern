@@ -1,20 +1,62 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import Creatable from "react-select/creatable";
+import { useAuth } from '../context/useAuth';
+import { useNavigate } from "react-router-dom";
 
 const CreateJob = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors },
   } = useForm();
 
   const [selectedOption, setSelectedOption] = useState(null);
+  const [companyProfile, setCompanyProfile] = useState(null);
+  const [jobDescription, setJobDescription] = useState("");
+
+  // Fetch company profile and auto-populate form
+  useEffect(() => {
+    if (user?.email) {
+      fetch(`http://localhost:3000/company-profile/${encodeURIComponent(user.email)}`)
+        .then((res) => {
+          if (res.ok) {
+            return res.json();
+          }
+          return null;
+        })
+        .then((profile) => {
+          if (profile) {
+            setCompanyProfile(profile);
+            // Auto-populate company fields
+            setValue('companyName', profile.companyName || '');
+            setValue('companyLogo', profile.companyLogo || '');
+          }
+        })
+        .catch(() => {
+          // No company profile found, that's okay
+        });
+    }
+  }, [user?.email, setValue]);
 
   const onSubmit = (data) => {
+    // Validate company profile data
+    if (!companyProfile || !companyProfile.companyName) {
+      alert("Please create your company profile first before posting a job.");
+      return;
+    }
+    
     data.skills = selectedOption;
-    // console.log(data);
+    data.postedBy = user?.email; // Ensure current user's email is used
+    data.description = jobDescription; // Use controlled description value
+    data.companyName = companyProfile.companyName; // Ensure company name from profile
+    data.companyLogo = companyProfile.companyLogo || ''; // Ensure company logo from profile
+    
+    console.log("Posting job with data:", data);
     fetch("http://localhost:3000/post-job", {
       method: "POST",
       headers: {
@@ -26,6 +68,7 @@ const CreateJob = () => {
       .then((result) => {
         if (result.acknowledged === true) {
           alert("Job posted successfully!");
+          navigate("/my-job");
         }
         reset();
       });
@@ -84,6 +127,14 @@ const CreateJob = () => {
   return (
     <div className="max-w-screen-2xl container mx-auto xl:px-24 px-4">
       <div className="bg-[#fafafa] py-10 px-4 lg:px-16">
+        {!companyProfile && (
+          <div className="mb-6 p-4 bg-yellow-100 border border-yellow-400 text-yellow-700 rounded">
+            <strong>Note:</strong> Please create your company profile first to auto-populate company details.
+            <a href="/company-profile" className="text-blue-600 underline ml-2">
+              Create Company Profile
+            </a>
+          </div>
+        )}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           <div className="create-job-flex ">
             <div className="lg:w-1/2 w-full">
@@ -98,11 +149,16 @@ const CreateJob = () => {
             <div className="lg:w-1/2 w-full">
               <label className="block mb-2 text-lg">Company Name</label>
               <input
-                className="create-job-input"
+                className="create-job-input bg-gray-100 cursor-not-allowed"
                 type="text"
-                placeholder="Ex: Microsoft"
+                placeholder={companyProfile?.companyName || "Please create company profile first"}
                 {...register("companyName")}
+                readOnly
+                value={companyProfile?.companyName || ""}
               />
+              <p className="text-xs text-gray-500 mt-1">
+                Auto-filled from company profile (read-only)
+              </p>
             </div>
           </div>
           <div className="create-job-flex">
@@ -181,11 +237,16 @@ const CreateJob = () => {
             <div className="lg:w-1/2 w-full">
               <label className="block mb-2 text-lg">Company Logo</label>
               <input
-                className="create-job-input"
+                className="create-job-input bg-gray-100 cursor-not-allowed"
                 type="url"
-                placeholder="Paste your company logo URL"
+                placeholder={companyProfile?.companyLogo || "Please add logo in company profile"}
                 {...register("companyLogo")}
+                readOnly
+                value={companyProfile?.companyLogo || ""}
               />
+              <p className="text-xs text-gray-500 mt-1">
+                Auto-filled from company profile (read-only)
+              </p>
             </div>
             <div className="lg:w-1/2 w-full">
               <label className="block mb-2 text-lg">Employment Type</label>
@@ -201,26 +262,44 @@ const CreateJob = () => {
             </div>
           </div>
           <div className="w-full">
-            <label className="block mb-2 text-lg">Job Description</label>
+            <label className="block mb-2 text-lg">
+              Job Description
+            </label>
             <textarea
-              className="w-full pl-3 py-1.5 focus:outline-none placeholder:text-gray-600 bg-white"
+              className="w-full pl-3 py-1.5 focus:outline-none placeholder:text-gray-600 bg-white border border-gray-300 rounded"
               rows={6}
-              placeholder="Job Description"
-              defaultValue={
-                "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quidem, eveniet."
-              }
-              {...register("description")}
+              placeholder="Describe the job role, responsibilities, requirements, and benefits..."
+              maxLength="500"
+              value={jobDescription}
+              onChange={(e) => setJobDescription(e.target.value)}
+              {...register("description", { 
+                onChange: (e) => setJobDescription(e.target.value),
+                value: jobDescription 
+              })}
             />
+            <div className="flex justify-between items-center mt-1">
+              <p className="text-xs text-gray-500">
+                Provide a concise description of the role and key requirements
+              </p>
+              <p className={`text-xs ${jobDescription.length > 1000 ? 'text-red-500' : 'text-gray-500'}`}>
+                {jobDescription.length}/1000 characters
+              </p>
+            </div>
           </div>
 
           <div>
             <label className="block mb-2 text-lg">Job Posted By</label>
             <input
-              className="w-full create-job-input"
+              className="w-full create-job-input bg-gray-100 cursor-not-allowed"
               type="email"
+              value={user?.email || ''}
               placeholder="Your email"
+              disabled
               {...register("postedBy")}
             />
+            <p className="text-xs text-gray-500 mt-1">
+              Auto-filled with your account email (read-only)
+            </p>
           </div>
           <input
             type="submit"
