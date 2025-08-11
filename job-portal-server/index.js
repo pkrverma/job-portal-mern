@@ -463,13 +463,17 @@ async function run() {
     app.patch("/application-status/:id", async (req, res) => {
       try {
         const id = req.params.id;
-        const { status } = req.body; // status should be 'selected' or 'rejected'
+        const { status, offerLetterUrl } = req.body; // status should be 'selected' or 'rejected'
         if (!["selected", "rejected"].includes(status)) {
           return res.status(400).send({ message: "Invalid status value" });
         }
+        const updateFields = { status };
+        if (status === "selected" && offerLetterUrl) {
+          updateFields.offerLetterUrl = offerLetterUrl;
+        }
         const result = await applicationCollections.updateOne(
           { _id: new ObjectId(id) },
-          { $set: { status } }
+          { $set: updateFields }
         );
         if (result.modifiedCount === 1) {
           res.status(200).send({ message: `Application ${status}`, status });
