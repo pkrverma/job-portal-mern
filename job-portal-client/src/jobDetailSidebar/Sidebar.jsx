@@ -30,7 +30,7 @@ const Sidebar = (props) => {
     const minF = formatMoney(minPrice);
     const maxF = formatMoney(maxPrice);
     if (!minF && !maxF) return null;
-    if (minF && maxF) return `₹${minF} - ₹${maxF}`;
+    if (minF && maxF) return `₹${minF}k - ₹${maxF}k`;
     return minF || maxF;
   })();
 

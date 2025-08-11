@@ -305,10 +305,9 @@ const UpdateJob = () => {
               rows={6}
               placeholder="Describe the job role, responsibilities, and requirements in detail..."
               value={jobDescription}
+              maxLength={800}
               onChange={(e) => {
-                if (e.target.value.length <= 1000) {
-                  setJobDescription(e.target.value);
-                }
+                setJobDescription(e.target.value);
               }}
             />
             <div className="flex justify-between items-center mt-1">
@@ -317,12 +316,12 @@ const UpdateJob = () => {
               </p>
               <p
                 className={`text-xs ${
-                  jobDescription.length > 1000
+                  jobDescription.length > 800
                     ? "text-red-500"
                     : "text-gray-500"
                 }`}
               >
-                {jobDescription.length}/1000 characters
+                {jobDescription.length}/800 characters
               </p>
             </div>
           </div>

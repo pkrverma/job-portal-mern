@@ -278,7 +278,7 @@ const CreateJob = () => {
               className="w-full pl-3 py-1.5 focus:outline-none placeholder:text-gray-600 bg-white border border-gray-300 rounded"
               rows={6}
               placeholder="Describe the job role, responsibilities, requirements, and benefits..."
-              maxLength="500"
+              maxLength="800"
               value={jobDescription}
               onChange={(e) => setJobDescription(e.target.value)}
               {...register("description", {
@@ -292,12 +292,12 @@ const CreateJob = () => {
               </p>
               <p
                 className={`text-xs ${
-                  jobDescription.length > 1000
+                  jobDescription.length > 800
                     ? "text-red-500"
                     : "text-gray-500"
                 }`}
               >
-                {jobDescription.length}/1000 characters
+                {jobDescription.length}/800 characters
               </p>
             </div>
           </div>

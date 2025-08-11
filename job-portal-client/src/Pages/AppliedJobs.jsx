@@ -197,7 +197,7 @@ const AppliedJobs = () => {
                             <FiDollarSign className="text-gray-400" />
                             {application.jobDetails.minPrice &&
                             application.jobDetails.maxPrice
-                              ? `${application.jobDetails.minPrice} - ${application.jobDetails.maxPrice}`
+                              ? `${application.jobDetails.minPrice}k - ${application.jobDetails.maxPrice}k`
                               : application.jobDetails.minPrice ||
                                 application.jobDetails.maxPrice}
                           </span>
@@ -232,21 +232,38 @@ const AppliedJobs = () => {
                   >
                     View Job
                   </Link>
-                  <button
-                    onClick={() =>
-                      handleWithdrawApplication(
-                        application.jobId,
-                        application.jobDetails?.jobTitle
-                      )
-                    }
-                    disabled={withdrawing === application.jobId}
-                    className="bg-red-500 text-white px-4 py-2 rounded text-sm hover:bg-red-600 transition disabled:opacity-50 flex items-center gap-1"
-                  >
-                    <FiTrash2 size={14} />
-                    {withdrawing === application.jobId
-                      ? "Withdrawing..."
-                      : "Withdraw"}
-                  </button>
+                  {application.status === "selected" ? (
+                    <a
+                      href={application.offerLetterUrl || undefined}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`bg-green-600 text-white px-4 py-2 rounded text-sm font-semibold border border-green-700 transition ${application.offerLetterUrl ? "hover:bg-green-700" : "opacity-50 cursor-not-allowed"}`}
+                      disabled={!application.offerLetterUrl}
+                      onClick={e => {
+                        if (!application.offerLetterUrl) {
+                          e.preventDefault();
+                        }
+                      }}
+                    >
+                      Get Offer Letter
+                    </a>
+                  ) : (
+                    <button
+                      onClick={() =>
+                        handleWithdrawApplication(
+                          application.jobId,
+                          application.jobDetails?.jobTitle
+                        )
+                      }
+                      disabled={withdrawing === application.jobId}
+                      className="bg-red-500 text-white px-4 py-2 rounded text-sm hover:bg-red-600 transition disabled:opacity-50 flex items-center gap-1"
+                    >
+                      <FiTrash2 size={14} />
+                      {withdrawing === application.jobId
+                        ? "Withdrawing..."
+                        : "Withdraw"}
+                    </button>
+                  )}
                 </div>
               </div>
             </div>

@@ -155,7 +155,7 @@ const Applications = () => {
                         </td>
                         <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
                           {application.jobDetails
-                            ? `₹ ${application.jobDetails.minPrice} - ${application.jobDetails.maxPrice}`
+                            ? `₹ ${application.jobDetails.minPrice}k - ${application.jobDetails.maxPrice}k`
                             : "N/A"}
                         </td>
                         <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
@@ -181,7 +181,12 @@ const Applications = () => {
                         </td>
                         <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
                           {application.status === "selected" ? (
-                            <span className="text-green-600 font-semibold">Selected</span>
+                            <>
+                              <span className="text-green-600 font-semibold">Selected</span>
+                              {application.offerLetterUrl ? (
+                                <span className="block text-blue-600 text-xs mt-1">Offer Letter Added</span>
+                              ) : null}
+                            </>
                           ) : application.status === "rejected" ? (
                             <span className="text-red-600 font-semibold">Rejected</span>
                           ) : (
@@ -190,18 +195,34 @@ const Applications = () => {
                                 title="Select"
                                 className="text-green-600 hover:text-green-800 mr-2 text-xs font-semibold border border-green-600 rounded px-2 py-1"
                                 onClick={async () => {
-                                  const appId = application._id;
-                                  const body = { status: "selected" };
-                                  console.log("PATCH application-status", appId, body);
-                                  const response = await fetch(`${import.meta.env.VITE_API_URL}/application-status/${appId}`, {
-                                    method: "PATCH",
-                                    headers: { "Content-Type": "application/json" },
-                                    body: JSON.stringify(body)
+                                  const { value: offerLetterUrl } = await window.Swal.fire({
+                                    title: 'Enter Offer Letter Link',
+                                    input: 'url',
+                                    inputLabel: 'Google Drive/Dropbox/Other link to offer letter',
+                                    inputPlaceholder: 'Paste offer letter link here',
+                                    showCancelButton: true,
+                                    confirmButtonText: 'Submit',
+                                    cancelButtonText: 'Cancel',
+                                    inputValidator: (value) => {
+                                      if (!value) {
+                                        return 'You need to provide a link!';
+                                      }
+                                    }
                                   });
-                                  const result = await response.json();
-                                  console.log("Server response:", result);
-                                  // Refetch applications from backend
-                                  fetchApplications(user.email);
+                                  if (offerLetterUrl) {
+                                    const appId = application._id;
+                                    const body = { status: "selected", offerLetterUrl };
+                                    console.log("PATCH application-status", appId, body);
+                                    const response = await fetch(`${import.meta.env.VITE_API_URL}/application-status/${appId}`, {
+                                      method: "PATCH",
+                                      headers: { "Content-Type": "application/json" },
+                                      body: JSON.stringify(body)
+                                    });
+                                    const result = await response.json();
+                                    window.Swal.fire('Offer Letter Added!', 'The offer letter link has been saved and will be visible to the job seeker.', 'success');
+                                    // Refetch applications from backend
+                                    fetchApplications(user.email);
+                                  }
                                 }}
                                 disabled={application.status === "selected" || application.status === "rejected"}
                               >
