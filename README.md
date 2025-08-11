@@ -33,30 +33,39 @@ Whether you are a recruiter looking to post new job openings or a job seeker sea
 - Easy job management and application tracking
 - Scalable and maintainable architecture
 
-## Screenshots
-![Home Page](job-portal-client/public/images/Notion.png)
-![Job Detail](job-portal-client/public/images/Linear.png)
-
-## Demo Video
-[Watch Demo](https://www.youtube.com/watch?v=your-demo-link)
-
-## Live Deployment
-- [Client (Vercel)](https://job-portal-client.vercel.app)
-- [Server (Render)](https://job-portal-server.onrender.com)
-
 ---
+
 
 ## How It Works
 1. **Sign Up / Login:** Users can sign up or log in using Google or email/password.
 2. **Role Selection:** On first login, users select their role (Recruiter or Job Seeker).
-3. **Recruiter Dashboard:** Recruiters can manage company profiles, post jobs, and view applications.
-4. **Job Seeker Dashboard:** Job seekers can search for jobs, apply, and track their applications.
-5. **Job Details:** Each job listing provides detailed information, company profile, and application options.
-6. **Salary Estimation:** Users can estimate salaries for various roles and locations.
-
-## Contributing
-Feel free to fork the repository, open issues, or submit pull requests. For questions or suggestions, please contact the maintainer or open an issue.
+3. **Recruiter Dashboard:** Recruiters are redirected to the post-job page after login/signup, where they can manage company profiles, post jobs, and view applications from job seekers.
+4. **Job Seeker Dashboard:** Job seekers can search for jobs, apply, and track the status of their applications, including offer letters and rejection notifications.
+5. **Job Details:** Each job listing provides comprehensive information, including company profile, job description, salary range, and application options.
+6. **Salary Estimation:** Users can estimate salaries for various roles and locations using the built-in salary tool.
 
 ---
 
-**Built with ❤️ by Pulkit K. Verma and contributors.**
+## Demo Video
+https://github.com/user-attachments/assets/7e55f86d-3696-458f-9a37-a206555f3c9c
+
+## Screenshots
+<img height="300" alt="Screenshot 2025-08-11 151210" src="https://github.com/user-attachments/assets/acf81d4f-e65a-4121-bab6-eac78f2ec2d3" />
+<img height="300" alt="Screenshot 2025-08-11 151158" src="https://github.com/user-attachments/assets/9ff2bc43-ba6e-46be-885f-2e41c51ca5aa" />
+<img height="300" alt="Screenshot 2025-08-11 150958" src="https://github.com/user-attachments/assets/2b5f50d3-5ab6-4b9a-b888-0aca4c9ef504" />
+<img height="300" alt="Screenshot 2025-08-11 151029" src="https://github.com/user-attachments/assets/70c360df-afa7-4b86-9a9e-b5b919fcca60" />
+<img height="300" alt="Screenshot 2025-08-11 151043" src="https://github.com/user-attachments/assets/09fb9348-aa60-43b5-98ec-1ae678fd4112" />
+<img height="300" alt="Screenshot 2025-08-11 151127" src="https://github.com/user-attachments/assets/99590619-a221-4418-8cf1-f48fc65e4277" />
+<img height="300" alt="Screenshot 2025-08-11 151258" src="https://github.com/user-attachments/assets/94428407-91a1-4f4d-8000-23e4ff2cfd77" />
+<img height="300" alt="Screenshot 2025-08-11 151322" src="https://github.com/user-attachments/assets/eef4fce0-b402-4ae0-8070-bfc0dd521382" />
+<img height="300" alt="Screenshot 2025-08-11 151350" src="https://github.com/user-attachments/assets/0181e6f3-4794-4702-90c2-b5de541005b9" />
+<img height="300" alt="Screenshot 2025-08-11 151411" src="https://github.com/user-attachments/assets/7db2ebce-8d8d-4557-b31d-da5ab0a5af32" />
+
+## Live Deployment
+ Website Link: https://job-portal-client-steel-two.vercel.app/
+
+---
+
+## Contributing
+Feel free to fork the repository, open issues, or submit pull requests. For questions or suggestions, please contact the me or open an issue.
+
