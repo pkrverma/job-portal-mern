@@ -65,7 +65,11 @@ const SignUp = () => {
         body: JSON.stringify(userData),
       });
 
-      navigate("/");
+      if (form.role === "recruiter") {
+        navigate("/post-job");
+      } else {
+        navigate("/");
+      }
     } catch (err) {
       setError(err.message.replace("Firebase: ", ""));
     } finally {
@@ -102,7 +106,11 @@ const SignUp = () => {
         body: JSON.stringify(userData),
       });
 
-      navigate("/");
+      if (form.role === "recruiter") {
+        navigate("/post-job");
+      } else {
+        navigate("/");
+      }
     } catch (err) {
       setError(err.message.replace("Firebase: ", ""));
     } finally {
