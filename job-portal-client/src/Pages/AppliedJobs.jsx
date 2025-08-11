@@ -164,9 +164,13 @@ const AppliedJobs = () => {
                           {application.jobDetails?.jobTitle ||
                             "Job Title Not Available"}
                         </h3>
-                        <span className="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded">
-                          Applied
-                        </span>
+                        {application.status === "selected" ? (
+                          <span className="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded">Selected</span>
+                        ) : application.status === "rejected" ? (
+                          <span className="bg-red-100 text-red-600 text-xs font-medium px-2 py-1 rounded">Rejected</span>
+                        ) : (
+                          <span className="bg-yellow-100 text-yellow-800 text-xs font-medium px-2 py-1 rounded">Pending</span>
+                        )}
                       </div>
 
                       <h4 className="text-lg text-blue-600 mb-3">

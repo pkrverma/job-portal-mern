@@ -103,6 +103,9 @@ const Applications = () => {
                     <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
                       Job Details
                     </th>
+                    <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
+                      Action
+                    </th>
                   </tr>
                 </thead>
 
@@ -175,6 +178,58 @@ const Applications = () => {
                           >
                             View Job
                           </Link>
+                        </td>
+                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                          {application.status === "selected" ? (
+                            <span className="text-green-600 font-semibold">Selected</span>
+                          ) : application.status === "rejected" ? (
+                            <span className="text-red-600 font-semibold">Rejected</span>
+                          ) : (
+                            <>
+                              <button
+                                title="Select"
+                                className="text-green-600 hover:text-green-800 mr-2 text-xs font-semibold border border-green-600 rounded px-2 py-1"
+                                onClick={async () => {
+                                  const appId = application._id;
+                                  const body = { status: "selected" };
+                                  console.log("PATCH application-status", appId, body);
+                                  const response = await fetch(`${import.meta.env.VITE_API_URL}/application-status/${appId}`, {
+                                    method: "PATCH",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify(body)
+                                  });
+                                  const result = await response.json();
+                                  console.log("Server response:", result);
+                                  // Refetch applications from backend
+                                  fetchApplications(user.email);
+                                }}
+                                disabled={application.status === "selected" || application.status === "rejected"}
+                              >
+                                Select
+                              </button>
+                              <button
+                                title="Reject"
+                                className="text-red-600 hover:text-red-800 text-xs font-semibold border border-red-600 rounded px-2 py-1"
+                                onClick={async () => {
+                                  const appId = application._id;
+                                  const body = { status: "rejected" };
+                                  console.log("PATCH application-status", appId, body);
+                                  const response = await fetch(`${import.meta.env.VITE_API_URL}/application-status/${appId}`, {
+                                    method: "PATCH",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify(body)
+                                  });
+                                  const result = await response.json();
+                                  console.log("Server response:", result);
+                                  // Refetch applications from backend
+                                  fetchApplications(user.email);
+                                }}
+                                disabled={application.status === "selected" || application.status === "rejected"}
+                              >
+                                Reject
+                              </button>
+                            </>
+                          )}
                         </td>
                       </tr>
                     ))}

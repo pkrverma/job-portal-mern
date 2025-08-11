@@ -8,13 +8,9 @@ const port = process.env.PORT || 3000;
 app.use(express.json());
 app.use(cors());
 
-//username: pulkit18012003
-//password: dwZwp08rYXATbBvL
-
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@job-portal.4vuwskt.mongodb.net/?retryWrites=true&w=majority&appName=job-portal`;
 
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
@@ -37,12 +33,14 @@ async function run() {
     // get all jobs with company details
     app.get("/all-jobs", async (req, res) => {
       const jobs = await jobCollections.find({}).toArray();
-      
+
       // Enrich jobs with company profile data
       const enrichedJobs = await Promise.all(
         jobs.map(async (job) => {
           try {
-            const companyProfile = await companyCollections.findOne({ recruiterEmail: job.postedBy });
+            const companyProfile = await companyCollections.findOne({
+              recruiterEmail: job.postedBy,
+            });
             if (companyProfile) {
               // Use company profile data if available
               job.companyName = companyProfile.companyName || job.companyName;
@@ -55,7 +53,7 @@ async function run() {
           return job;
         })
       );
-      
+
       res.send(enrichedJobs);
     });
 
@@ -63,11 +61,13 @@ async function run() {
     app.get("/all-jobs/:id", async (req, res) => {
       const id = req.params.id;
       const job = await jobCollections.findOne({ _id: new ObjectId(id) });
-      
+
       if (job) {
         // Try to get company details for this job
         try {
-          const companyProfile = await companyCollections.findOne({ recruiterEmail: job.postedBy });
+          const companyProfile = await companyCollections.findOne({
+            recruiterEmail: job.postedBy,
+          });
           if (companyProfile) {
             job.companyProfile = companyProfile;
           }
@@ -75,7 +75,7 @@ async function run() {
           console.log("No company profile found for this job");
         }
       }
-      
+
       res.send(job);
     });
 
@@ -152,51 +152,55 @@ async function run() {
     app.post("/register-user", async (req, res) => {
       try {
         const userData = req.body;
-        
+
         // Check if user already exists
-        const existingUser = await userCollections.findOne({ 
-          $or: [
-            { email: userData.email },
-            { uid: userData.uid }
-          ]
+        const existingUser = await userCollections.findOne({
+          $or: [{ email: userData.email }, { uid: userData.uid }],
         });
-        
+
         if (existingUser) {
           // Update existing user's role if needed
           const result = await userCollections.updateOne(
             { $or: [{ email: userData.email }, { uid: userData.uid }] },
             { $set: { role: userData.role, name: userData.name } }
           );
-          return res.status(200).send({ message: "User updated successfully", result });
+          return res
+            .status(200)
+            .send({ message: "User updated successfully", result });
         } else {
           // Create new user
           const result = await userCollections.insertOne(userData);
-          return res.status(201).send({ message: "User registered successfully", result });
+          return res
+            .status(201)
+            .send({ message: "User registered successfully", result });
         }
       } catch (error) {
         console.error("Error registering user:", error);
-        return res.status(500).send({ message: "Failed to register user", error: error.message });
+        return res
+          .status(500)
+          .send({ message: "Failed to register user", error: error.message });
       }
     });
 
     //apply for a job
     app.post("/apply-job", async (req, res) => {
       try {
-        const { jobId, jobTitle, applicantName, applicantEmail, linkedinUrl } = req.body;
-        
+        const { jobId, jobTitle, applicantName, applicantEmail, linkedinUrl } =
+          req.body;
+
         // Check if user already applied for this job
         const existingApplication = await applicationCollections.findOne({
           jobId: jobId,
-          applicantEmail: applicantEmail
+          applicantEmail: applicantEmail,
         });
-        
+
         if (existingApplication) {
           return res.status(400).send({
             message: "You have already applied for this job",
-            status: false
+            status: false,
           });
         }
-        
+
         const applicationData = {
           jobId,
           jobTitle,
@@ -204,16 +208,16 @@ async function run() {
           applicantEmail,
           linkedinUrl,
           appliedAt: new Date(),
-          status: "pending"
+          status: "pending",
         };
-        
+
         const result = await applicationCollections.insertOne(applicationData);
-        
+
         if (result.insertedId) {
           return res.status(200).send({
             message: "Application submitted successfully",
             status: true,
-            applicationId: result.insertedId
+            applicationId: result.insertedId,
           });
         } else {
           return res.status(500).send({
@@ -226,7 +230,7 @@ async function run() {
         return res.status(500).send({
           message: "Internal server error",
           status: false,
-          error: error.message
+          error: error.message,
         });
       }
     });
@@ -235,20 +239,20 @@ async function run() {
     app.get("/check-application/:jobId/:email", async (req, res) => {
       try {
         const { jobId, email } = req.params;
-        
+
         const existingApplication = await applicationCollections.findOne({
           jobId: jobId,
-          applicantEmail: decodeURIComponent(email)
+          applicantEmail: decodeURIComponent(email),
         });
-        
+
         res.status(200).send({
-          hasApplied: !!existingApplication
+          hasApplied: !!existingApplication,
         });
       } catch (error) {
         console.error("Error checking application:", error);
         res.status(500).send({
           hasApplied: false,
-          error: error.message
+          error: error.message,
         });
       }
     });
@@ -258,7 +262,7 @@ async function run() {
       try {
         const email = decodeURIComponent(req.params.email);
         const user = await userCollections.findOne({ email: email });
-        
+
         if (user) {
           res.status(200).send(user);
         } else {
@@ -266,7 +270,9 @@ async function run() {
         }
       } catch (error) {
         console.error("Error fetching user:", error);
-        res.status(500).send({ message: "Internal server error", error: error.message });
+        res
+          .status(500)
+          .send({ message: "Internal server error", error: error.message });
       }
     });
 
@@ -275,7 +281,7 @@ async function run() {
       try {
         const uid = req.params.uid;
         const user = await userCollections.findOne({ uid: uid });
-        
+
         if (user) {
           res.status(200).send(user);
         } else {
@@ -283,7 +289,9 @@ async function run() {
         }
       } catch (error) {
         console.error("Error fetching user by UID:", error);
-        res.status(500).send({ message: "Internal server error", error: error.message });
+        res
+          .status(500)
+          .send({ message: "Internal server error", error: error.message });
       }
     });
 
@@ -291,26 +299,37 @@ async function run() {
     app.post("/company-profile", async (req, res) => {
       try {
         const companyData = req.body;
-        
+
         // Check if company profile already exists for this recruiter
-        const existingCompany = await companyCollections.findOne({ 
-          recruiterEmail: companyData.recruiterEmail 
+        const existingCompany = await companyCollections.findOne({
+          recruiterEmail: companyData.recruiterEmail,
         });
-        
+
         if (existingCompany) {
-          return res.status(409).send({ message: "Company profile already exists. Use PATCH to update." });
+          return res
+            .status(409)
+            .send({
+              message: "Company profile already exists. Use PATCH to update.",
+            });
         }
-        
+
         // Remove _id field if present (shouldn't be in new data, but just in case)
         const { _id, ...newCompanyData } = companyData;
-        
+
         // Create new company profile
         newCompanyData.createdAt = new Date().toISOString();
         const result = await companyCollections.insertOne(newCompanyData);
-        return res.status(201).send({ message: "Company profile created successfully", result });
+        return res
+          .status(201)
+          .send({ message: "Company profile created successfully", result });
       } catch (error) {
         console.error("Error creating company profile:", error);
-        return res.status(500).send({ message: "Failed to create company profile", error: error.message });
+        return res
+          .status(500)
+          .send({
+            message: "Failed to create company profile",
+            error: error.message,
+          });
       }
     });
 
@@ -318,29 +337,36 @@ async function run() {
     app.patch("/company-profile", async (req, res) => {
       try {
         const companyData = req.body;
-        
+
         // Check if company profile exists for this recruiter
-        const existingCompany = await companyCollections.findOne({ 
-          recruiterEmail: companyData.recruiterEmail 
+        const existingCompany = await companyCollections.findOne({
+          recruiterEmail: companyData.recruiterEmail,
         });
-        
+
         if (!existingCompany) {
           return res.status(404).send({ message: "Company profile not found" });
         }
-        
+
         // Remove _id field from update data to avoid immutable field error
         const { _id, ...updateData } = companyData;
-        
+
         // Update existing company profile
         const result = await companyCollections.updateOne(
           { recruiterEmail: companyData.recruiterEmail },
           { $set: updateData }
         );
-        
-        return res.status(200).send({ message: "Company profile updated successfully", result });
+
+        return res
+          .status(200)
+          .send({ message: "Company profile updated successfully", result });
       } catch (error) {
         console.error("Error updating company profile:", error);
-        return res.status(500).send({ message: "Failed to update company profile", error: error.message });
+        return res
+          .status(500)
+          .send({
+            message: "Failed to update company profile",
+            error: error.message,
+          });
       }
     });
 
@@ -348,8 +374,10 @@ async function run() {
     app.get("/company-profile/:email", async (req, res) => {
       try {
         const recruiterEmail = decodeURIComponent(req.params.email);
-        const company = await companyCollections.findOne({ recruiterEmail: recruiterEmail });
-        
+        const company = await companyCollections.findOne({
+          recruiterEmail: recruiterEmail,
+        });
+
         if (company) {
           res.status(200).send(company);
         } else {
@@ -357,7 +385,9 @@ async function run() {
         }
       } catch (error) {
         console.error("Error fetching company profile:", error);
-        res.status(500).send({ message: "Internal server error", error: error.message });
+        res
+          .status(500)
+          .send({ message: "Internal server error", error: error.message });
       }
     });
 
@@ -365,36 +395,42 @@ async function run() {
     app.get("/applied-jobs/:email", async (req, res) => {
       try {
         const userEmail = decodeURIComponent(req.params.email);
-        
+
         // Get all applications by this user
-        const applications = await applicationCollections.find({ applicantEmail: userEmail }).toArray();
-        
+        const applications = await applicationCollections
+          .find({ applicantEmail: userEmail })
+          .toArray();
+
         if (applications.length === 0) {
           return res.send([]);
         }
-        
+
         // Get job details for each application
         const enrichedApplications = await Promise.all(
           applications.map(async (application) => {
             try {
-              const jobDetails = await jobCollections.findOne({ _id: new ObjectId(application.jobId) });
+              const jobDetails = await jobCollections.findOne({
+                _id: new ObjectId(application.jobId),
+              });
               return {
                 ...application,
-                jobDetails: jobDetails || null
+                jobDetails: jobDetails || null,
               };
             } catch (error) {
               return {
                 ...application,
-                jobDetails: null
+                jobDetails: null,
               };
             }
           })
         );
-        
+
         res.send(enrichedApplications);
       } catch (error) {
         console.error("Error fetching applied jobs:", error);
-        res.status(500).send({ message: "Internal server error", error: error.message });
+        res
+          .status(500)
+          .send({ message: "Internal server error", error: error.message });
       }
     });
 
@@ -402,20 +438,49 @@ async function run() {
     app.delete("/withdraw-application", async (req, res) => {
       try {
         const { jobId, applicantEmail } = req.body;
-        
+
         const result = await applicationCollections.deleteOne({
           jobId: jobId,
-          applicantEmail: applicantEmail
+          applicantEmail: applicantEmail,
         });
-        
+
         if (result.deletedCount === 1) {
-          res.status(200).send({ message: "Application withdrawn successfully" });
+          res
+            .status(200)
+            .send({ message: "Application withdrawn successfully" });
         } else {
           res.status(404).send({ message: "Application not found" });
         }
       } catch (error) {
         console.error("Error withdrawing application:", error);
-        res.status(500).send({ message: "Internal server error", error: error.message });
+        res
+          .status(500)
+          .send({ message: "Internal server error", error: error.message });
+      }
+    });
+
+    //update application status (selected/rejected)
+    app.patch("/application-status/:id", async (req, res) => {
+      try {
+        const id = req.params.id;
+        const { status } = req.body; // status should be 'selected' or 'rejected'
+        if (!["selected", "rejected"].includes(status)) {
+          return res.status(400).send({ message: "Invalid status value" });
+        }
+        const result = await applicationCollections.updateOne(
+          { _id: new ObjectId(id) },
+          { $set: { status } }
+        );
+        if (result.modifiedCount === 1) {
+          res.status(200).send({ message: `Application ${status}`, status });
+        } else {
+          res.status(404).send({ message: "Application not found" });
+        }
+      } catch (error) {
+        console.error("Error updating application status:", error);
+        res
+          .status(500)
+          .send({ message: "Internal server error", error: error.message });
       }
     });
 
@@ -423,41 +488,49 @@ async function run() {
     app.get("/applications/:email", async (req, res) => {
       try {
         const recruiterEmail = decodeURIComponent(req.params.email);
-        
+
         // Get all jobs posted by this recruiter
-        const recruiterJobs = await jobCollections.find({ postedBy: recruiterEmail }).toArray();
-        const jobIds = recruiterJobs.map(job => job._id.toString());
-        
+        const recruiterJobs = await jobCollections
+          .find({ postedBy: recruiterEmail })
+          .toArray();
+        const jobIds = recruiterJobs.map((job) => job._id.toString());
+
         if (jobIds.length === 0) {
           return res.send([]);
         }
-        
+
         // Get all applications for these jobs
-        const applications = await applicationCollections.find({ 
-          jobId: { $in: jobIds } 
-        }).toArray();
-        
+        const applications = await applicationCollections
+          .find({
+            jobId: { $in: jobIds },
+          })
+          .toArray();
+
         // Enrich applications with job details
-        const enrichedApplications = applications.map(application => {
-          const jobDetails = recruiterJobs.find(job => job._id.toString() === application.jobId);
+        const enrichedApplications = applications.map((application) => {
+          const jobDetails = recruiterJobs.find(
+            (job) => job._id.toString() === application.jobId
+          );
           return {
             ...application,
-            jobDetails: jobDetails ? {
-              companyName: jobDetails.companyName,
-              minPrice: jobDetails.minPrice,
-              maxPrice: jobDetails.maxPrice,
-              salaryType: jobDetails.salaryType,
-              jobLocation: jobDetails.jobLocation
-            } : null
+            jobDetails: jobDetails
+              ? {
+                  companyName: jobDetails.companyName,
+                  minPrice: jobDetails.minPrice,
+                  maxPrice: jobDetails.maxPrice,
+                  salaryType: jobDetails.salaryType,
+                  jobLocation: jobDetails.jobLocation,
+                }
+              : null,
           };
         });
-        
+
         res.send(enrichedApplications);
       } catch (error) {
         console.error("Error fetching applications:", error);
         res.status(500).send({
           message: "Internal server error",
-          error: error.message
+          error: error.message,
         });
       }
     });

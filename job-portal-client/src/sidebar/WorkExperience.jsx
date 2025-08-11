@@ -9,7 +9,7 @@ const WorkExperience = ({ handleChange }) => {
         <InputField
           handleChange={handleChange}
           value="Any experience"
-          title="Any experience"
+          title=""
           name="test4"
         />
         <InputField
