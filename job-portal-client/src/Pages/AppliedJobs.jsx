@@ -255,8 +255,8 @@ const AppliedJobs = () => {
                           application.jobDetails?.jobTitle
                         )
                       }
-                      disabled={withdrawing === application.jobId}
-                      className="bg-red-500 text-white px-4 py-2 rounded text-sm hover:bg-red-600 transition disabled:opacity-50 flex items-center gap-1"
+                      disabled={withdrawing === application.jobId || application.status === "rejected"}
+                      className={`bg-red-500 text-white px-4 py-2 rounded text-sm flex items-center gap-1 transition disabled:opacity-50 ${application.status === "rejected" ? "cursor-not-allowed" : "hover:bg-red-600"}`}
                     >
                       <FiTrash2 size={14} />
                       {withdrawing === application.jobId

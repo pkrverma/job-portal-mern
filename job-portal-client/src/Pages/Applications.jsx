@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { useAuth } from "../context/useAuth";
+import Swal from "sweetalert2";
 
 const Applications = () => {
   const [applications, setApplications] = useState([]);
@@ -195,7 +196,7 @@ const Applications = () => {
                                 title="Select"
                                 className="text-green-600 hover:text-green-800 mr-2 text-xs font-semibold border border-green-600 rounded px-2 py-1"
                                 onClick={async () => {
-                                  const { value: offerLetterUrl } = await window.Swal.fire({
+                                  const { value: offerLetterUrl } = await Swal.fire({
                                     title: 'Enter Offer Letter Link',
                                     input: 'url',
                                     inputLabel: 'Google Drive/Dropbox/Other link to offer letter',
@@ -219,7 +220,7 @@ const Applications = () => {
                                       body: JSON.stringify(body)
                                     });
                                     const result = await response.json();
-                                    window.Swal.fire('Offer Letter Added!', 'The offer letter link has been saved and will be visible to the job seeker.', 'success');
+                                    Swal.fire('Offer Letter Added!', 'The offer letter link has been saved and will be visible to the job seeker.', 'success');
                                     // Refetch applications from backend
                                     fetchApplications(user.email);
                                   }
