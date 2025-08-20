@@ -550,7 +550,7 @@ async function run() {
 run().catch(console.dir);
 
 app.get("/", (req, res) => {
-  res.send("Welcome to the Job Portal Server!");
+  res.send("Welcome to the Talent Stream Server!");
 });
 
 app.listen(port, () => {

@@ -1,7 +1,7 @@
-# Job Portal (MERN)
+# Talent Stream (MERN)
 
 ## Introduction
-Welcome to the Job Portal! This is a full-stack web application designed to connect recruiters and job seekers in a modern, efficient, and user-friendly way. Built using the MERN stack (MongoDB, Express.js, React, Node.js), it provides all the essential features for posting jobs, searching for opportunities, and managing applications.
+Welcome to the Talent Stream! This is a MERN stack web application designed to connect recruiters and job seekers in a modern, efficient, and user-friendly way. Built using the MERN stack (MongoDB, Express.js, React, Node.js), it provides all the essential features for posting jobs, searching for opportunities, and managing applications.
 
 Whether you are a recruiter looking to post new job openings or a job seeker searching for your next opportunity, this platform is built to make the process seamless and intuitive.
 
